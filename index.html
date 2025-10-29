@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마그네틱 픽업 출력 A/B 비교</title>
+    <!-- Tailwind CSS 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Inter 폰트 적용 (Tailwind 기본 폰트) */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* 숫자 입력 필드에서 스핀 버튼 숨기기 */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        /* 커스텀 select 화살표 */
+        .custom-select {
+            background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27 fill=%27none%27 stroke=%27currentColor%27 stroke-width=%271.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpath d=%27M6 8l4 4 4-4%27/%3e%3c/svg%3e');
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.5em 1.5em;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4 md:p-8">
+
+    <div class="w-full max-w-4xl bg-white shadow-2xl rounded-2xl p-8 space-y-8">
+
+        <!-- 앱 제목 -->
+        <div class="text-center">
+            <h1 class="text-3xl font-bold text-gray-800">마그네틱 픽업 출력 A/B 비교</h1>
+            <p class="text-gray-600 mt-2">Magnetic Pickup Output Comparison</p>
+            <p class="text-sm text-gray-500 mt-2">Score = M × (R / R<sub>AWG</sub>) × F<sub>c</sub> × W<sub>p</sub></p>
+        </div>
+
+        <!-- 픽업 비교 컨테이너 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+            <!-- 픽업 A 입력 폼 -->
+            <div id="pickupAForm" class="space-y-5 border border-gray-200 p-6 rounded-lg">
+                <h2 class="text-2xl font-semibold text-center text-blue-700">픽업 A</h2>
+
+                <!-- 1. 임피던스 (DCR) -->
+                <div>
+                    <label for="dcrA" class="block text-sm font-medium text-gray-700 mb-2">1. 임피던스 (DCR) (kΩ)</label>
+                    <input type="number" id="dcrA" name="dcrA" step="0.01" placeholder="예: 8.5"
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                </div>
+
+                <!-- 2. 자석 종류 (M) -->
+                <div>
+                    <label for="magnetA" class="block text-sm font-medium text-gray-700 mb-2">2. 자석 종류 (M)</label>
+                    <select id="magnetA" name="magnetA"
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none bg-white custom-select">
+                        <option value="1.00">Alnico 5 (Default)</option>
+                        <option value="1.35">Ceramic 8</option>
+                        <option value="0.90">Alnico 4</option>
+                        <option value="0.80">Alnico 3 / 2</option>
+                        <option value="0.75">Alnico 1</option>
+                    </select>
+                </div>
+
+                <!-- 3. AWG (R_AWG) -->
+                <div>
+                    <label for="awgA" class="block text-sm font-medium text-gray-700 mb-2">3. 구리선 굵기
+                        (R<sub>AWG</sub>)</label>
+                    <select id="awgA" name="awgA"
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none bg-white custom-select">
+                        <option value="1.00">42 AWG (Default)</option>
+                        <option value="0.80">41 AWG</option>
+                        <option value="1.27">43 AWG</option>
+                        <option value="1.60">44 AWG</option>
+                    </select>
+                </div>
+
+                <!-- 4. 폼팩터 (F_c) -->
+                <div>
+                    <label for="formFactorA" class="block text-sm font-medium text-gray-700 mb-2">4. 픽업 폼팩터
+                        (F<sub>c</sub>)</label>
+                    <select id="formFactorA" name="formFactorA"
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none bg-white custom-select">
+                        <option value="1.00">Humbucker (Default)</option>
+                        <option value="1.05">Strat</option>
+                        <option value="1.035">Tele 브릿지</option>
+                        <option value="1.01">Tele 넥</option>
+                        <option value="0.895">P-90</option>
+                        <option value="0.725">Jazzmaster</option>
+                    </select>
+                </div>
+
+                <!-- 5. 권선 패턴 (Wp) -->
+                <div>
+                    <label for="windingA" class="block text-sm font-medium text-gray-700 mb-2">5. 권선 패턴
+                        (W<sub>p</sub>)</label>
+                    <select id="windingA" name="windingA"
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none bg-white custom-select">
+                        <option value="1.00">Machine Wound (Default)</option>
+                        <option value="1.05">Hot Machine Wound</option>
+                        <option value="0.95">Scatter Wound (Vintage)</option>
+                    </select>
+                </div>
+
+                <!-- 픽업 A 결과 -->
+                <div id="resultAreaA" class="bg-blue-50 p-6 rounded-xl text-center transition-all duration-300">
+                    <h2 class="text-lg font-medium text-blue-800">픽업 A Output Score</h2>
+                    <p id="outputScoreA" class="text-5xl font-extrabold text-blue-600 mt-2 tracking-tight">0.00</p>
+                    <p id="tendencyA" class="text-sm font-medium text-blue-700 mt-2 min-h-[1.25rem]">
+                        <!-- 성향이 여기에 표시됩니다 -->
+                    </p>
+                </div>
+            </div>
+
+            <!-- 픽업 B 입력 폼 -->
+            <div id="pickupBForm" class="space-y-5 border border-gray-200 p-6 rounded-lg">
+                <h2 class="text-2xl font-semibold text-center text-green-700">픽업 B</h2>
+
+                <!-- 1. 임피던스 (DCR) -->
+                <div>
+                    <label for="dcrB" class="block text-sm font-medium text-gray-700 mb-2">1. 임피던스 (DCR) (kΩ)</label>
+                    <input type="number" id="dcrB" name="dcrB" step="0.01" placeholder="예: 16.5"
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
+                </div>
+
+                <!-- 2. 자석 종류 (M) -->
+                <div>
+                    <label for="magnetB" class="block text-sm font-medium text-gray-700 mb-2">2. 자석 종류 (M)</label>
+                    <select id="magnetB" name="magnetB"
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all appearance-none bg-white custom-select">
+                        <option value="1.00">Alnico 5 (Default)</option>
+                        <option value="1.35">Ceramic 8</option>
+                        <option value="0.90">Alnico 4</option>
+                        <option value="0.80">Alnico 3 / 2</option>
+                        <option value="0.75">Alnico 1</option>
+                    </select>
+                </div>
+
+                <!-- 3. AWG (R_AWG) -->
+                <div>
+                    <label for="awgB" class="block text-sm font-medium text-gray-700 mb-2">3. 구리선 굵기
+                        (R<sub>AWG</sub>)</label>
+                    <select id="awgB" name="awgB"
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all appearance-none bg-white custom-select">
+                        <option value="1.00">42 AWG (Default)</option>
+                        <option value="0.80">41 AWG</option>
+                        <option value="1.27">43 AWG</option>
+                        <option value="1.60">44 AWG</option>
+                    </select>
+                </div>
+
+                <!-- 4. 폼팩터 (F_c) -->
+                <div>
+                    <label for="formFactorB" class="block text-sm font-medium text-gray-700 mb-2">4. 픽업 폼팩터
+                        (F<sub>c</sub>)</label>
+                    <select id="formFactorB" name="formFactorB"
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all appearance-none bg-white custom-select">
+                        <option value="1.00">Humbucker (Default)</option>
+                        <option value="1.05">Strat</option>
+                        <option value="1.035">Tele 브릿지</option>
+                        <option value="1.01">Tele 넥</option>
+                        <option value="0.895">P-90</option>
+                        <option value="0.725">Jazzmaster</option>
+                    </select>
+                </div>
+
+                <!-- 5. 권선 패턴 (Wp) -->
+                <div>
+                    <label for="windingB" class="block text-sm font-medium text-gray-700 mb-2">5. 권선 패턴
+                        (W<sub>p</sub>)</label>
+                    <select id="windingB" name="windingB"
+                        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all appearance-none bg-white custom-select">
+                        <option value="1.00">Machine Wound (Default)</option>
+                        <option value="1.05">Hot Machine Wound</option>
+                        <option value="0.95">Scatter Wound (Vintage)</option>
+                    </select>
+                </div>
+
+                <!-- 픽업 B 결과 -->
+                <div id="resultAreaB" class="bg-green-50 p-6 rounded-xl text-center transition-all duration-300">
+                    <h2 class="text-lg font-medium text-green-800">픽업 B Output Score</h2>
+                    <p id="outputScoreB" class="text-5xl font-extrabold text-green-600 mt-2 tracking-tight">0.00</p>
+                    <p id="tendencyB" class="text-sm font-medium text-green-700 mt-2 min-h-[1.25rem]">
+                        <!-- 성향이 여기에 표시됩니다 -->
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 최종 비교 결과 -->
+        <div id="comparisonArea"
+            class="bg-gray-50 p-6 rounded-xl text-center transition-all duration-300 border-t-4 border-gray-300">
+            <h2 class="text-xl font-semibold text-gray-800">최종 비교 결과</h2>
+            <p id="comparisonResult" class="text-2xl text-gray-700 mt-3 min-h-[2rem]">
+                픽업 정보를 입력해 주세요.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- DOM 요소 선택 ---
+            // (A)
+            const dcrA = document.getElementById('dcrA');
+            const magnetA = document.getElementById('magnetA');
+            const awgA = document.getElementById('awgA');
+            const formFactorA = document.getElementById('formFactorA');
+            const windingA = document.getElementById('windingA');
+            const outputScoreA = document.getElementById('outputScoreA');
+            const tendencyA = document.getElementById('tendencyA');
+            // (B)
+            const dcrB = document.getElementById('dcrB');
+            const magnetB = document.getElementById('magnetB');
+            const awgB = document.getElementById('awgB');
+            const formFactorB = document.getElementById('formFactorB');
+            const windingB = document.getElementById('windingB');
+            const outputScoreB = document.getElementById('outputScoreB');
+            const tendencyB = document.getElementById('tendencyB');
+            // (Result)
+            const comparisonResult = document.getElementById('comparisonResult');
+
+            // --- 종합 픽업 성향 추론 함수 ---
+            /**
+             * 픽업의 스펙을 기반으로 예상 성향을 종합적으로 추론합니다.
+             * @param {number} score - 계산된 최종 Output Score
+             * @param {number} dcr - 원본 DCR 값 (kΩ)
+             * @param {string} magnetVal - 자석 계수 (값)
+             * @param {string} awgVal - AWG 계수 (값)
+             * @param {string} windingVal - 권선 패턴 계수 (값)
+             * @returns {string} - 예상 성향 텍스트
+             */
+            function getTendency(score, dcr, magnetVal, awgVal, windingVal) {
+                if (score === 0 || dcr === 0) return ''; // 계산 불가시 반환
+
+                let outputLevel, feel, baseTone, magnetModifier;
+
+                // 1. 출력 레벨 (Score 기반)
+                if (score < 7) outputLevel = "Vintage Output";
+                else if (score < 11) outputLevel = "Mid Output";
+                else if (score < 15) outputLevel = "Hot Output";
+                else outputLevel = "Very Hot Output";
+
+                // 2. 질감 (Winding 기반)
+                if (windingVal === "0.95") { // Scatter Wound
+                    feel = "Dynamic / Open";
+                } else if (windingVal === "1.05") { // Hot Wound
+                    feel = "Compressed / Saturated";
+                } else { // Machine Wound (1.00)
+                    feel = "Modern / Focused";
+                }
+
+                // 3. 기본 톤 (DCR과 AWG로 보정한 '정규화된 DCR' 기반)
+                // R_norm = R / R_AWG (이 값이 권선수를 가장 잘 대변함)
+                const normalizedDCR = dcr / parseFloat(awgVal);
+
+                if (normalizedDCR > 13) {
+                    baseTone = "Dark / Saturated";
+                } else if (normalizedDCR > 9) {
+                    baseTone = "Warm / Mid-Focused";
+                } else if (normalizedDCR > 6) {
+                    baseTone = "Full / Balanced";
+                } else {
+                    baseTone = "Bright / Clear";
+                }
+
+                // 4. 톤 수식어 (Magnet 기반)
+                if (magnetVal === "1.35") { // Ceramic
+                    magnetModifier = " (Aggressive / Tight)";
+                } else if (magnetVal === "0.80" || magnetVal === "0.75") { // Alnico 2/3/1
+                    magnetModifier = " (Soft / Spongy)";
+                } else if (magnetVal === "0.90") { // Alnico 4
+                    magnetModifier = " (Balanced / Even)";
+                } else { // Alnico 5 (1.00)
+                    magnetModifier = " (Punchy / Scooped)"; // 'Bright' 대신 A5의 특징을 더 잘 나타내는 'Scooped'
+                }
+
+                // 5. 종합
+                return `${outputLevel} / ${feel} / ${baseTone}${magnetModifier}`;
+            }
+
+            // --- Score 계산 함수 ---
+            function calculateScores() {
+                // 1. 픽업 A 값 가져오기
+                const RA = parseFloat(dcrA.value) || 0;
+                const MA = parseFloat(magnetA.value);
+                const R_AWGA = parseFloat(awgA.value);
+                const F_cA = parseFloat(formFactorA.value);
+                const W_pA = parseFloat(windingA.value);
+                const ScoreA = MA * (RA / R_AWGA) * F_cA * W_pA;
+
+                // 2. 픽업 B 값 가져오기
+                const RB = parseFloat(dcrB.value) || 0;
+                const MB = parseFloat(magnetB.value);
+                const R_AWGB = parseFloat(awgB.value);
+                const F_cB = parseFloat(formFactorB.value);
+                const W_pB = parseFloat(windingB.value);
+                const ScoreB = MB * (RB / R_AWGB) * F_cB * W_pB;
+
+                // 3. 각 픽업 결과 표시
+                outputScoreA.textContent = ScoreA.toFixed(2);
+                outputScoreB.textContent = ScoreB.toFixed(2);
+
+                // 4. 성향 추론 (RA, RB 값을 인자로 전달)
+                tendencyA.textContent = getTendency(ScoreA, RA, magnetA.value, awgA.value, windingA.value);
+                tendencyB.textContent = getTendency(ScoreB, RB, magnetB.value, awgB.value, windingB.value);
+
+                // 5. 비교 결과 계산 및 표시
+                updateComparison(ScoreA, ScoreB);
+            }
+
+            // --- 비교 결과 업데이트 함수 ---
+            function updateComparison(ScoreA, ScoreB) {
+                comparisonResult.textContent = ''; // 내용 비우기
+
+                if (ScoreA === 0 && ScoreB === 0) {
+                    comparisonResult.textContent = "두 픽업의 정보를 입력해 주세요.";
+                    return;
+                }
+                if (ScoreA === 0 || ScoreB === 0) {
+                    comparisonResult.textContent = "Score가 0인 픽업이 있어 비교할 수 없습니다.";
+                    return;
+                }
+                if (ScoreA === ScoreB) {
+                    comparisonResult.textContent = "두 픽업의 출력이 ";
+                    const span = document.createElement('span');
+                    span.className = 'font-bold text-gray-800';
+                    span.textContent = '동일';
+                    comparisonResult.append(span, "합니다.");
+                    return;
+                }
+
+                if (ScoreA > ScoreB) {
+                    const ratio = ScoreA / ScoreB;
+                    const span = document.createElement('span');
+                    span.className = 'font-bold text-blue-600';
+                    span.textContent = `${ratio.toFixed(2)}배`;
+                    comparisonResult.append(`픽업 A가 픽업 B보다 `, span, ` 더 강합니다.`);
+                } else {
+                    const ratio = ScoreB / ScoreA;
+                    const span = document.createElement('span');
+                    span.className = 'font-bold text-green-600';
+                    span.textContent = `${ratio.toFixed(2)}배`;
+                    comparisonResult.append(`픽업 B가 픽업 A보다 `, span, ` 더 강합니다.`);
+                }
+            }
+
+            // --- 이벤트 리스너 추가 ---
+            const allInputs = [
+                dcrA, magnetA, awgA, formFactorA, windingA,
+                dcrB, magnetB, awgB, formFactorB, windingB
+            ];
+
+            allInputs.forEach(input => {
+                const eventType = (input.tagName === 'INPUT') ? 'input' : 'change';
+                input.addEventListener(eventType, calculateScores);
+            });
+
+            // 페이지 로드 시 초기 계산 실행
+            calculateScores();
+        });
+    </script>
+
+</body>
+
+</html>
